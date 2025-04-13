@@ -204,29 +204,3 @@ class RandomForestRegressor:
         tree_predictions = np.array([tree.predict(X) for tree in self.trees])
         # Average predictions across trees
         return np.mean(tree_predictions, axis=0)
-
-
-# -----------------------------------------------
-# Example usage:
-# -----------------------------------------------
-if __name__ == "__main__":
-    # Generate synthetic data for demonstration:
-    np.random.seed(42)
-    # Suppose we have 100 samples and 5 features.
-    X = np.random.rand(100, 5)
-    # Create a target variable as a simple (noisy) sum of features.
-    y = np.sum(X, axis=1) + np.random.randn(100) * 0.1
-
-    # Convert to NumPy arrays if starting from a Pandas DataFrame:
-    # For example:
-    # df = pd.DataFrame(X, columns=[f"Feature_{i}" for i in range(5)])
-    # y = pd.Series(y)
-    # X = df.values
-
-    # Initialize and train the Random Forest regressor.
-    rf = RandomForestRegressor(n_trees=10, max_depth=5, min_samples_split=2)
-    rf.fit(X, y)
-
-    # Make predictions on the training data.
-    predictions = rf.predict(X)
-    print("Predictions:\n", predictions)

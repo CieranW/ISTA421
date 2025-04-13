@@ -1,7 +1,9 @@
 from step3_assessment import get_data
 from step6_chosen_algo import RandomForestRegressor
 from step7_chosen_validation import cross_validate
+from plots import plot_data
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -26,6 +28,26 @@ def main():
     # Calculate average MSE
     avg_mse = sum(mse) / len(mse)
     print("Average MSE:", avg_mse)
+
+    # Plotting the results
+    # plot_data(y, predictions)
+
+    # Feature importance plot
+    feature_importances = rf.feature_importances_
+    feature_names = df.drop(columns="Excess Readmission Ratio").columns
+    feature_importance_df = pd.DataFrame(
+        {"Feature": feature_names, "Importance": feature_importances}
+    )
+    feature_importance_df = feature_importance_df.sort_values(
+        by="Importance", ascending=False
+    )
+    print("Feature Importances:")
+    print(feature_importance_df)
+    # Plot feature importances
+    feature_importance_df.plot(
+        kind="bar", x="Feature", y="Importance", title="Feature Importances"
+    )
+    plt.show()
 
 
 if __name__ == "__main__":

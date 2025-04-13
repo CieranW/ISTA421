@@ -19,7 +19,7 @@ def get_data():
     # Testing purposes
     # data_summ(df)
     # plot_data(df)
-    print(df["Number of Readmissions"].head())
+    # print(df["Number of Readmissions"].head())
 
     return df
 
@@ -35,6 +35,15 @@ def data_summ(df):
     print(df.describe())
     print(df.info())
     print(df.head())
+
+    # Coefficient of variation
+    print("Coefficient of Variation:")
+    for col in df.columns:
+        if df[col].dtype == "float64":
+            mean = df[col].mean()
+            std = df[col].std()
+            cv = std / mean
+            print(f"{col}: {cv:.2f}")
 
 
 def clean_dataset(df):

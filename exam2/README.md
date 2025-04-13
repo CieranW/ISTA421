@@ -1,7 +1,5 @@
 # Exam 2 Portion 2
 
-## 1. Resources
-
 ## 2. Dataset Assessment
 
 ## 3. Variables
@@ -33,16 +31,25 @@ Some illnesses, medical conditions, etc. may require more treatment and attentio
 
 ## 6. Chosen Algorithm
 
-Random Forest
+Random Forest as my algorithm. Decided to use Random Forest as there were a lot of predictors that could affect the target feature. I wanted to see how they would affect it and what the outcome would be.
 
 ## 7. Algorithm Validation
 
-K-Fold Cross Validation
+K-Fold Cross Validation.
 
 ## 8.
 
 ### Disclosures
 
+Used a Gen AI for the Random Forests Model and debugging.
+
+Additional references:
+https://medium.com/@enozeren/building-a-random-forest-model-from-scratch-81583cbaa7a9
+https://github.com/enesozeren/machine_learning_from_scratch/blob/main/decision_trees/random_forest.py
+https://github.com/enesozeren/machine_learning_from_scratch/blob/main/decision_trees/decision_tree.py
+
 ### How to Run
+
+Within the folder should be a file named main.py. Just open it and run, everything else should follow.
 
 ## 9. Summary
