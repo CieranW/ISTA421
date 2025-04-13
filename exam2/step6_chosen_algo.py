@@ -204,3 +204,13 @@ class RandomForestRegressor:
         tree_predictions = np.array([tree.predict(X) for tree in self.trees])
         # Average predictions across trees
         return np.mean(tree_predictions, axis=0)
+
+    def feature_importances_(self):
+        """Calculate feature importances based on the average impurity decrease."""
+        # Initialize feature importances
+        feature_importances = np.zeros(self.trees[0].n_features_all)
+        for tree in self.trees:
+            # Accumulate feature importances from each tree
+            feature_importances += tree.feature_importances_
+        # Normalize to get average importance
+        return feature_importances / self.n_trees
