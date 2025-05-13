@@ -33,21 +33,26 @@ def main():
     # plot_data(y, predictions)
 
     # Feature importance plot
-    feature_importances = rf.feature_importances_
-    feature_names = df.drop(columns="Excess Readmission Ratio").columns
-    feature_importance_df = pd.DataFrame(
-        {"Feature": feature_names, "Importance": feature_importances}
-    )
-    feature_importance_df = feature_importance_df.sort_values(
-        by="Importance", ascending=False
-    )
-    print("Feature Importances:")
-    print(feature_importance_df)
-    # Plot feature importances
-    feature_importance_df.plot(
-        kind="bar", x="Feature", y="Importance", title="Feature Importances"
-    )
-    plt.show()
+    try:
+        feature_importances = rf.feature_importances_
+        feature_names = df.drop(columns="Excess Readmission Ratio").columns
+        feature_importance_df = pd.DataFrame(
+            {"Feature": feature_names, "Importance": feature_importances}
+        )
+        feature_importance_df = feature_importance_df.sort_values(
+            by="Importance", ascending=False
+        )
+        print("Feature Importances:")
+        print(feature_importance_df)
+        # Plot feature importances
+        feature_importance_df.plot(
+            kind="bar", x="Feature", y="Importance", title="Feature Importances"
+        )
+        plt.show()
+    except AttributeError:
+        print(
+            "The RandomForestRegressor implementation does not support feature importances."
+        )
 
 
 if __name__ == "__main__":
