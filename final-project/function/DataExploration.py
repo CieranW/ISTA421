@@ -16,7 +16,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 
-def plot_correlation_matrix(df: pd.DataFrame) -> None:
+def plotCorrelationMatrix(df: pd.DataFrame) -> None:
     """
     This function plots a correlation matrix for the DataFrame.
     It helps in understanding the relationships between different features in the dataset.
@@ -28,17 +28,17 @@ def plot_correlation_matrix(df: pd.DataFrame) -> None:
     plt.show()
 
 
-def plot_pairwise_relationships(df: pd.DataFrame, hue: str) -> None:
+def plotPairwiseRelationships(df: pd.DataFrame) -> None:
     """
     This function plots pairwise relationships in the dataset using seaborn's pairplot.
     It helps in visualizing the relationships between different features and the target variable.
     """
-    sns.pairplot(df, hue=hue)
+    sns.pairplot(df, hue="Stage", diag_kind="kde")
     plt.title("Pairwise Relationships")
     plt.show()
 
 
-def plot_pca(df: pd.DataFrame, n_components: int = 2) -> None:
+def plotPCA(df: pd.DataFrame, n_components: int = 2) -> None:
     """
     This function performs PCA on the dataset and plots the first two principal components.
     It helps in visualizing the data in a lower-dimensional space.
@@ -57,7 +57,7 @@ def plot_pca(df: pd.DataFrame, n_components: int = 2) -> None:
     plt.show()
 
 
-def plot_kmeans_clusters(df: pd.DataFrame, n_clusters: int = 3) -> None:
+def plotKmeansClusters(df: pd.DataFrame, n_clusters: int = 3) -> None:
     """
     This function performs KMeans clustering on the dataset and plots the clusters.
     It helps in understanding the grouping of data points based on the features.
@@ -82,7 +82,7 @@ def plot_kmeans_clusters(df: pd.DataFrame, n_clusters: int = 3) -> None:
     plt.show()
 
 
-def plot_silhouette_score(df: pd.DataFrame, n_clusters_range: List[int]) -> None:
+def plotSilhouetteScore(df: pd.DataFrame, n_clusters_range: List[int]) -> None:
     """
     This function calculates and plots the silhouette score for different numbers of clusters.
     It helps in determining the optimal number of clusters for KMeans clustering.
@@ -106,7 +106,7 @@ def plot_silhouette_score(df: pd.DataFrame, n_clusters_range: List[int]) -> None
     plt.show()
 
 
-def plot_feature_importance(df: pd.DataFrame, target: str) -> None:
+def plotFeatureImportance(df: pd.DataFrame, target: str) -> None:
     """
     This function calculates and plots the feature importance using Random Forest.
     It helps in understanding the contribution of each feature to the target variable.
@@ -132,7 +132,7 @@ def plot_feature_importance(df: pd.DataFrame, target: str) -> None:
     plt.show()
 
 
-def plot_categorical_distribution(df: pd.DataFrame, column: str) -> None:
+def plotCategoricalDistribution(df: pd.DataFrame, column: str) -> None:
     """
     This function plots the distribution of a categorical variable in the dataset.
     It helps in understanding the frequency of each category in the variable.
@@ -145,7 +145,7 @@ def plot_categorical_distribution(df: pd.DataFrame, column: str) -> None:
     plt.show()
 
 
-def plot_numerical_distribution(df: pd.DataFrame, column: str) -> None:
+def plotNumericalDistribution(df: pd.DataFrame, column: str) -> None:
     """
     This function plots the distribution of a numerical variable in the dataset.
     It helps in understanding the distribution of values in the variable.
@@ -158,7 +158,7 @@ def plot_numerical_distribution(df: pd.DataFrame, column: str) -> None:
     plt.show()
 
 
-def plot_histogram(df: pd.DataFrame, column: str) -> None:
+def plotHistogram(df: pd.DataFrame, column: str) -> None:
     """
     This function plots a histogram for the specified column in the DataFrame.
     It helps in understanding the distribution of the data for that column.
@@ -171,7 +171,7 @@ def plot_histogram(df: pd.DataFrame, column: str) -> None:
     plt.show()
 
 
-def plot_boxplot(df: pd.DataFrame, column: str) -> None:
+def plotBoxplot(df: pd.DataFrame, column: str) -> None:
     """
     This function plots a box plot for the specified column in the DataFrame.
     It helps in identifying outliers and understanding the spread of the data.
@@ -183,7 +183,7 @@ def plot_boxplot(df: pd.DataFrame, column: str) -> None:
     plt.show()
 
 
-def plot_scatter(df: pd.DataFrame, x_column: str, y_column: str) -> None:
+def plotScatter(df: pd.DataFrame, x_column: str, y_column: str) -> None:
     """
     This function plots a scatter plot for the specified x and y columns in the DataFrame.
     It helps in understanding the relationship between the two variables.
