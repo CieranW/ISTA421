@@ -9,6 +9,21 @@ import numpy as np
 from collections import Counter, defaultdict
 import multiprocessing as mp
 
+# Helper function
+def randomForest(X, y):
+    """
+    Train a Random Forest classifier on the given data.
+    :param X: Feature matrix.
+    :param y: Target vector.
+    :return: Trained Random Forest model.
+    """
+    print("Random Forest Classifier")
+    rf = RandomForest(n_trees=30, max_depth=8)
+    rf.fitTree(X, y)
+    accuracy = rf.score(X, y)
+    print(f"Accuracy: {accuracy:.2f}")
+    print(f"Feature Importances: {rf.feature_importances_}")
+    
 
 # GINI Impurity
 def gini(y) -> float:
@@ -70,18 +85,18 @@ class DecisionTree:
         self.feature_importances_ = defaultdict(float)
         self.root = None
 
-    def fit(self, X, y, depth=0) -> None:
+    def _fit(self, X, y, depth=0) -> None:
         """
         Fit the decision tree to the training data.
         :param X: Feature matrix.
         :param y: Target vector.
         :param depth: Current depth of the tree.
         """
-        if len(set(y) == 1 or len(y) < self.min_samples or depth >= self.max_depth):
-            return TreeNode(
-                is_leaf=True,
-                prediction=Counter(y).most_common(1)[0][0],
-            )
+        if len(y) == 0:
+            return TreeNode(is_leaf=True, prediction=0)  # fallback
+
+        if len(set(y)) == 1 or len(y) < self.min_samples or depth >= self.max_depth:
+            return TreeNode(is_leaf=True, prediction=Counter(y).most_common(1)[0][0])
 
         n_samples, n_features = X.shape
         best_gain, best_feature, best_threshold, best_splits = 0, None, None, None
@@ -91,7 +106,9 @@ class DecisionTree:
 
             if len(values) < 10 and X[:, feature].dtype.kind in {"i"}:
                 splits = {val: y[X[:, feature] == val] for val in values}
-                impurity = sum(len(subset) / len(y) * gini(subset) for subset in splits.values())
+                impurity = sum(
+                    len(subset) / len(y) * gini(subset) for subset in splits.values()
+                )
                 gain = gini(y) - impurity
 
                 if gain > best_gain:
@@ -109,14 +126,17 @@ class DecisionTree:
 
                     left_y, right_y = y[left], y[right]
 
-                    gain = gini(y) = (len(left_y) / len(y)) * gini(left_y) + (len(right_y) / len(y)) * gini(right_y)
+                    gain = gini(y) - (
+                        (len(left_y) / len(y)) * gini(left_y)
+                        + (len(right_y) / len(y)) * gini(right_y)
+                    )
 
                     if gain > best_gain:
                         best_gain = gain
                         best_feature = feature
                         best_threshold = val
                         best_splits = (
-                            left, 
+                            left,
                             right,
                         )
 
@@ -135,24 +155,26 @@ class DecisionTree:
             )
             left_X, left_y = X[best_splits[0]], y[best_splits[0]]
             right_X, right_y = X[best_splits[1]], y[best_splits[1]]
-            node.left = self.fit(left_X, left_y, depth + 1)
-            node.right = self.fit(right_X, right_y, depth + 1)
+            node.left = self._fit(left_X, left_y, depth + 1)
+            node.right = self._fit(right_X, right_y, depth + 1)
             return node
         else:
             node = TreeNode(feature=best_feature)
             for val, subset in best_splits.items():
-                node.branches[val] = self.fit(X[X[:, best_feature] == val], subset, depth + 1)
+                node.branches[val] = self._fit(
+                    X[X[:, best_feature] == val], subset, depth + 1
+                )
             return node
 
-    def train(self, X, y) -> None:
+    def _train(self, X, y) -> None:
         """
         Train the decision tree.
         :param X: Feature matrix.
         :param y: Target vector.
         """
-        self.root = self.fit(X, y)
+        self.root = self._fit(X, y)
 
-    def predictOne(self, x, node) -> int:
+    def _predictOne(self, x, node) -> int:
         """
         Predict the class for a single sample.
         :param x: Feature vector.
@@ -164,21 +186,30 @@ class DecisionTree:
 
         if node.threshold is not None:
             if x[node.feature] <= node.threshold:
-                return self.predictOne(x, node.left if x[node.feature] <= node.threshold else node.right)
+                return self._predictOne(
+                    x, node.left if x[node.feature] <= node.threshold else node.right
+                )
             else:
-                return self.predictOne(x, node.right if x[node.feature] > node.threshold else node.left)
+                return self._predictOne(
+                    x, node.right if x[node.feature] > node.threshold else node.left
+                )
         else:
-            return self.predictOne(x, node.branches.get(x[node.feature], TreeNode(is_leaf=True, prediction=0)))
+            return self._predictOne(
+                x,
+                node.branches.get(
+                    x[node.feature], TreeNode(is_leaf=True, prediction=0)
+                ),
+            )
 
-    def predict(self, X) -> np.ndarray:
+    def _predict(self, X) -> np.ndarray:
         """
         Predict the classes for a set of samples.
         :param X: Feature matrix.
         :return: Predicted classes.
         """
-        return np.array([self.predict_one(x, self.root) for x in X])
+        return np.array([self._predictOne(x, self.root) for x in X])
 
-    def printTree(self, node=None, depth=0) -> None:
+    def _printTree(self, node=None, depth=0) -> None:
         """
         Print the decision tree.
         :param node: Current node in the tree.
@@ -193,13 +224,14 @@ class DecisionTree:
 
         if node.threshold is not None:
             print(f"{' ' * depth * 2}Feature {node.feature} <= {node.threshold}")
-            self.print_tree(node.left, depth + 1)
+            self._printTree(node.left, depth + 1)
             print(f"{' ' * depth * 2}Feature {node.feature} > {node.threshold}")
-            self.print_tree(node.right, depth + 1)
+            self._printTree(node.right, depth + 1)
         else:
             for val, branch in node.branches.items():
                 print(f"{' ' * depth * 2}Feature {node.feature} == {val}")
-                self.print_tree(branch, depth + 1)
+                self._printTree(branch, depth + 1)
+
 
 # Random Forest Class
 class RandomForest:
@@ -207,7 +239,7 @@ class RandomForest:
     A class representing a random forest classifier.
     """
 
-    def __init__(self, n_trees=10, max_depth=None, min_samples=2, min_gain=0.0001):
+    def __init__(self, n_trees=10, max_depth=10, min_samples=5):
         """
         Initialize the random forest.
         :param n_trees: Number of trees in the forest.
@@ -218,4 +250,69 @@ class RandomForest:
         self.trees = []
         self.max_depth = max_depth
         self.min_samples = min_samples
-        self.min_gain = min_gain
+        self.feature_importances_ = defaultdict(float)
+
+    def _trainTree(self, seed, X, y) -> DecisionTree:
+        """
+        Train a single decision tree.
+        :param seed: Random seed for reproducibility.
+        :param X: Feature matrix.
+        :param y: Target vector.
+        :return: Trained decision tree.
+        """
+        np.random.seed(seed)
+        n_samples = len(X)
+        indices = np.random.choice(n_samples, n_samples, replace=True)
+        X_sample, y_sample = X[indices], y[indices]
+
+        tree = DecisionTree(max_depth=self.max_depth, min_samples=self.min_samples)
+        tree._train(X_sample, y_sample)
+        return tree
+
+    def fitTree(self, X, y) -> None:
+        """
+        Fit the random forest to the training data.
+        :param X: Feature matrix.
+        :param y: Target vector.
+        """
+
+        seeds = np.random.randint(0, 1000000, self.n_trees)
+
+        with mp.Pool(mp.cpu_count()) as pool:
+            results = pool.starmap(self._trainTree, [(seed, X, y) for seed in seeds])
+        self.trees = results
+
+        for tree in self.trees:
+            for feature, importance in tree.feature_importances_.items():
+                self.feature_importances_[feature] += importance / len(self.trees)
+
+    def _predict(self, X) -> np.ndarray:
+        """
+        Predict the classes for a set of samples.
+        :param X: Feature matrix.
+        :return: Predicted classes.
+        """
+        predictions = np.array([tree._predict(X) for tree in self.trees])
+        return np.apply_along_axis(
+            lambda row: Counter(row).most_common(1)[0][0], axis=0, arr=predictions
+        )
+
+    def _featureImportance(self) -> None:
+        """
+        Calculate the feature importances for the random forest.
+        """
+        for tree in self.trees:
+            for feature, importance in tree.feature_importances_.items():
+                self.feature_importances_[feature] += importance / len(self.trees)
+        return self.feature_importances_
+
+    def score(self, X, y) -> float:
+        """
+        Calculate the accuracy of the random forest.
+        :param X: Feature matrix.
+        :param y: Target vector.
+        :return: Accuracy of the random forest.
+        """
+        predictions = self._predict(X)
+        accuracy = np.sum(predictions == y) / len(y)
+        return accuracy

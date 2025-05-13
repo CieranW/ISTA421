@@ -126,8 +126,11 @@ def cleanData(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Convert GeneticMarker to numerical values
+    # Nan
+    df["GeneticMarker"] = df["GeneticMarker"].fillna("None")
     df["GeneticMarker"] = df["GeneticMarker"].map(
         {
+            "None": 0,
             "BRCA1": 1,
             "KRAS": 2,
             "EGFR": 3,
@@ -146,8 +149,7 @@ def cleanData(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
 
-    # Nan
-    df["GeneticMarker"].fillna(0, inplace=True)
+    
     # Drop unnecessary columns
     df.drop(columns=["HospitalRegion"], inplace=True)
 
@@ -158,20 +160,17 @@ def splitData(df: pd.DataFrame) -> dict:
     """
     This function splits the data into subsets based on cancer type and returns a dictionary of DataFrames.
     """
-    # Split the data into subsets based on cancer type
-    df_breast = df[df["CancerType"] == "breast"]
-    df_colon = df[df["CancerType"] == "colon"]
-    df_lung = df[df["CancerType"] == "lung"]
-    df_prostate = df[df["CancerType"] == "prostate"]
-    df_skin = df[df["CancerType"] == "skin"]
-
-    # Create a dictionary of DataFrames
-    data_dict = {
-        "breast": df_breast,
-        "colon": df_colon,
-        "lung": df_lung,
-        "prostate": df_prostate,
-        "skin": df_skin,
+    data_dict = {}
+    cancer_types = {
+        1: "breast",
+        2: "colon",
+        3: "prostate",
+        4: "lung",
+        5: "leukemia",
+        6: "skin"
     }
+
+    for code, label in cancer_types.items():
+        data_dict[label] = df[df["CancerType"] == code]
 
     return data_dict
