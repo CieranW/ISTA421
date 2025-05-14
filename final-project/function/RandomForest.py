@@ -29,6 +29,9 @@ def randomForest(X, y):
 def gini(y) -> float:
     """
     Calculate the Gini impurity for a list of labels.
+    1 - sum(p_i^2) where p_i is the proportion of each class.
+    :param y: List of labels.
+    :return: Gini impurity.
     """
     labels, counts = np.unique(y, return_counts=True)
     prob_sq = (counts / counts.sum()) ** 2
